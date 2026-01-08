@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "types": ["@logseq/libs"],
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}

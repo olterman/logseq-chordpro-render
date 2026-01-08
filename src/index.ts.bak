@@ -1,0 +1,97 @@
+/// <reference types="@logseq/libs" />
+
+type Block = {
+  uuid: string;
+  content?: string;
+  children?: Block[];
+};
+
+/**
+ * Find the first block on the current page that starts with [[chordpro]]
+ */
+const findChordProBlockOnCurrentPage = async (): Promise<Block | null> => {
+  let pageUuid: string | null = null;
+
+  // 1️⃣ Prefer current block context
+  const currentBlock = await logseq.Editor.getCurrentBlock();
+  if (currentBlock?.page?.uuid) {
+    pageUuid = currentBlock.page.uuid;
+  }
+
+  // 2️⃣ Fallback to current page
+  if (!pageUuid) {
+    const currentPage = await logseq.Editor.getCurrentPage();
+    if (currentPage?.uuid) {
+      pageUuid = currentPage.uuid;
+    }
+  }
+
+  if (!pageUuid) return null;
+
+  const blocks = await logseq.Editor.getPageBlocksTree(pageUuid);
+  if (!blocks) return null;
+
+  const walk = (blocks: Block[]): Block | null => {
+    for (const block of blocks) {
+      if (
+        typeof block.content === "string" &&
+        block.content.trim().toLowerCase().startsWith("[[chordpro]]")
+      ) {
+        return block;
+      }
+
+      if (block.children?.length) {
+        const found = walk(block.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  return walk(blocks);
+};
+
+/**
+ * Handle detection result
+ * (this is where rendering logic will go later)
+ */
+const handleChordProDetection = async (source: string) => {
+  const block = await findChordProBlockOnCurrentPage();
+
+  if (block) {
+    console.log(`🎸 ChordPro detected (${source})`, block.uuid);
+
+    // OPTIONAL: scroll to it (comment out if annoying)
+    // await logseq.Editor.scrollToBlockInPage(block.uuid);
+  }
+};
+
+/**
+ * Main entry
+ */
+ const main = async () => {
+   console.log("ChordPro plugin loaded");
+ 
+   // ⏱ Deferred initial scan (critical)
+   setTimeout(() => {
+     handleChordProDetection("initial-load");
+   }, 500);
+ 
+   // Page navigation
+   logseq.App.onPageChanged(async () => {
+     await handleChordProDetection("page-change");
+   });
+ 
+   // Block edits (debounced)
+   let debounceTimer: number | null = null;
+ 
+   logseq.DB.onChanged(() => {
+     if (debounceTimer) clearTimeout(debounceTimer);
+ 
+     debounceTimer = window.setTimeout(async () => {
+       await handleChordProDetection("block-change");
+     }, 300);
+   });
+ };
+
+logseq.ready(main).catch(console.error);

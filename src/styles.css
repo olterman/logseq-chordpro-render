@@ -1,0 +1,36 @@
+body {
+    background-color: #282c34;
+    color: #abb2bf;
+}
+
+pre.chord-line {
+    color: #c678dd;  /* Purple for chords */
+    font-weight: bold;
+}
+
+pre.lyric-line {
+    color: #abb2bf;  /* Light gray for lyrics */
+}
+
+.chorus {
+    background-color: #2c313a;
+    border-left: 4px solid #61afef;  /* Blue highlight */
+    padding: 8px 12px;
+}
+
+.comment {
+    color: #98c379;  /* Green for comments */
+}
+
+.title {
+    color: #e06c75;  /* Pink for title */
+}
+
+.subtitle {
+    color: #d19a66;  /* Orange for subtitle */
+}
+
+#song-container {
+    border: 1px solid #3e4451;
+    padding: 20px;
+}
