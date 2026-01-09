@@ -21,6 +21,8 @@ function hash(text: string): string {
 function sanitizeChordPro(input: string): string {
   return input
     .replace(/\[\[chordpro\]\]\s*\n?/gi, "")
+    .replace(/\`\`\`chords\s*\n?/gi, "")
+    .replace(/\`\`\`*\n?/gi, "")
     .replace(/\[\[[^\]]+\]\]/g, "")
     //.replace(/\{comment:[^}]*\}/gi, "")
     .trim();
@@ -40,7 +42,9 @@ async function detectAndRender(reason: string) {
     for (const b of nodes) {
       if (
         typeof b.content === "string" &&
+        
         b.content.toLowerCase().includes("[[chordpro]]")
+        //b.content.toLowerCase().includes("{title:[^}]*\}")
       ) {
         return b;
       }
@@ -73,8 +77,9 @@ async function detectAndRender(reason: string) {
     const doc = sanitizeChordPro(source);
     //const style = "<head><style>.chord-line { color: #0066cc; font-weight: bold; } .title {color: #e06c75;  /* Pink for title */}</style></head>";
     html = chordpro.renderToHTML(doc);
+    // html = style + chordpro.renderToHTML(doc);
     // After rendering
-    // document.querySelectorAll('.chord-line').forEach(el => { el.style.color = '#0066cc';});
+    document.querySelectorAll('.chord-line').forEach(el => { el.style.color = '#0066cc';});
 
   } catch (err) {
     console.error("🎵 [ChordPro] Render error", err, { source });
@@ -85,7 +90,8 @@ async function detectAndRender(reason: string) {
 	try {
   		const children = await logseq.Editor.getBlockChildren(block.uuid);
   		for (const child of children ?? []) {
-    		if (typeof child.content === "string" && child.content.startsWith("```html")) {
+    		if (typeof child.content === "string" && child.content.startsWith("<h1>")) {
+            log("FOUND child -> killing it", child.uuid);
       			await logseq.Editor.removeBlock(child.uuid);
     		}
   		}

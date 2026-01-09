@@ -1,15 +1,15 @@
-function y(c, r = {}) {
+function y(o, r = {}) {
   const u = { showTitle: !0, showSubtitle: !0, showChords: !0, showComments: !0, ...r };
   let a = "";
-  if (u.showTitle && c.title && (a += `<h1>${i(c.title)}</h1>`), u.showSubtitle && c.subtitle && (a += `<h2>${i(c.subtitle)}</h2>`), c.artist && (a += `<div class="artist">${i(c.artist)}</div>`), c.key && (a += `<div class="key">Key: ${i(c.key)}</div>`), c.metadata && c.metadata.transpose && typeof u.transposeChords == "function") {
-    const e = parseInt(c.metadata.transpose, 10);
-    isNaN(e) || c.sections.forEach((t) => {
+  if (u.showTitle && o.title && (a += `<h1>${i(o.title)}</h1>`), u.showSubtitle && o.subtitle && (a += `<h2>${i(o.subtitle)}</h2>`), o.artist && (a += `<div class="artist">${i(o.artist)}</div>`), o.key && (a += `<div class="key">Key: ${i(o.key)}</div>`), o.metadata && o.metadata.transpose && typeof u.transposeChords == "function") {
+    const e = parseInt(o.metadata.transpose, 10);
+    isNaN(e) || o.sections.forEach((t) => {
       t.lines.forEach((l) => {
         l.type === "chordLine" && l.chords && (l.chords = l.chords.map((n) => u.transposeChords(n, e)));
       });
     });
   }
-  return c.sections.forEach((e) => {
+  return o.sections.forEach((e) => {
     switch (e.type) {
       case "chorus":
         a += '<div class="section chorus">', e.label && (a += `<div class="section-label">${i(e.label)}</div>`);
@@ -51,9 +51,9 @@ function y(c, r = {}) {
             if (n.length === 2 && n[0] === "C" && n[1] === "G" || n[0] === "D" && n[1] === "A") l = n[0] + " ".repeat(12) + n[1];
             else {
               let s = 0;
-              for (let o = 0; o < n.length; o++) {
-                const d = p[o] - s;
-                l += " ".repeat(Math.max(0, d)) + n[o], s = p[o] + n[o].length;
+              for (let c = 0; c < n.length; c++) {
+                const d = p[c] - s;
+                l += " ".repeat(Math.max(0, d)) + n[c], s = p[c] + n[c].length;
               }
             }
             a += `<pre class="chord-line">${i(l)}</pre>`, a += `<pre class="lyric-line">${i(t.lyrics)}</pre>`;
@@ -66,9 +66,9 @@ function y(c, r = {}) {
           a += `<div class="chorus-ref">Chorus${t.label ? ": " + i(t.label) : ""}</div>`;
           break;
         case "chord":
-          c.metadata && c.metadata.chords && c.metadata.chords[t.name] ? a += `<div class="chord-diagram">
+          o.metadata && o.metadata.chords && o.metadata.chords[t.name] ? a += `<div class="chord-diagram">
               <div class="chord-name">${i(t.name)}</div>
-              <div class="chord-definition">${i(c.metadata.chords[t.name])}</div>
+              <div class="chord-definition">${i(o.metadata.chords[t.name])}</div>
             </div>` : a += `<div class="chord-diagram">
               <div class="chord-name">${i(t.name)}</div>
             </div>`;
@@ -88,9 +88,9 @@ function y(c, r = {}) {
     }), a += "</div>";
   }), a;
 }
-function i(c) {
+function i(o) {
   const r = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
-  return c.replace(/[&<>"']/g, (u) => r[u]);
+  return o.replace(/[&<>"']/g, (u) => r[u]);
 }
 class m {
   constructor(r = {}) {
@@ -104,11 +104,11 @@ class m {
       return e.sections.push(t), a.forEach((l) => {
         if (l.trim().match(/^\{([^:}]+)(?::([^}]*))?\}$/)) {
           const n = l.trim().match(/^\{([^:}]+)(?::([^}]*))?\}$/), p = n[1].trim().toLowerCase(), s = n[2] ? n[2].trim() : "";
-          let o = {};
+          let c = {};
           if (s && s.includes("=")) {
             const h = /([a-zA-Z0-9_-]+)=["']([^"']*)["']/g;
             let b;
-            for (; (b = h.exec(s)) !== null; ) o[b[1]] = b[2];
+            for (; (b = h.exec(s)) !== null; ) c[b[1]] = b[2];
           }
           let d = p;
           switch (p.includes("-") && (d = p.split("-")[0]), d) {
@@ -157,7 +157,7 @@ class m {
               e.metadata.capo = s;
               break;
             case "meta":
-              if (Object.keys(o).length > 0) for (const [h, b] of Object.entries(o)) e.metadata[h] = b;
+              if (Object.keys(c).length > 0) for (const [h, b] of Object.entries(c)) e.metadata[h] = b;
               break;
             case "comment":
             case "c":
@@ -175,11 +175,11 @@ class m {
               t.lines.push({ type: "highlight", content: s });
               break;
             case "image":
-              t.lines.push({ type: "image", src: o.src || s, scale: o.scale || "100%" });
+              t.lines.push({ type: "image", src: c.src || s, scale: c.scale || "100%" });
               break;
             case "start_of_chorus":
             case "soc":
-              t = { type: "chorus", lines: [], label: o.label || s || "" }, e.sections.push(t);
+              t = { type: "chorus", lines: [], label: c.label || s || "" }, e.sections.push(t);
               break;
             case "end_of_chorus":
             case "eoc":
@@ -198,19 +198,19 @@ class m {
               break;
             case "start_of_verse":
             case "sov":
-              t = { type: "verse", lines: [], label: o.label || s || "" }, e.sections.push(t);
+              t = { type: "verse", lines: [], label: c.label || s || "" }, e.sections.push(t);
               break;
             case "start_of_bridge":
             case "sob":
-              t = { type: "bridge", lines: [], label: o.label || s || "" }, e.sections.push(t);
+              t = { type: "bridge", lines: [], label: c.label || s || "" }, e.sections.push(t);
               break;
             case "start_of_tab":
             case "sot":
-              t = { type: "tab", lines: [], label: o.label || s || "" }, e.sections.push(t);
+              t = { type: "tab", lines: [], label: c.label || s || "" }, e.sections.push(t);
               break;
             case "start_of_grid":
             case "sog":
-              t = { type: "grid", lines: [], label: o.label || s || "" }, e.sections.push(t);
+              t = { type: "grid", lines: [], label: c.label || s || "" }, e.sections.push(t);
               break;
             case "start_of_abc":
             case "start_of_ly":
@@ -316,9 +316,9 @@ class m {
         else if (l.includes("[") && l.includes("]")) {
           const n = [], p = [];
           let s = l;
-          const o = /\[([^\]]+)\]/g;
+          const c = /\[([^\]]+)\]/g;
           let d, h = 0;
-          for (; (d = o.exec(l)) !== null; ) n.push(d[1]), p.push(d.index - h), h += d[0].length, s = s.replace(d[0], "");
+          for (; (d = c.exec(l)) !== null; ) n.push(d[1]), p.push(d.index - h), h += d[0].length, s = s.replace(d[0], "");
           t.lines.push({ type: "chordLine", lyrics: s, chords: n, positions: p });
         } else l.trim() === "" ? t.lines.push({ type: "empty" }) : t.lines.push({ type: "lyricLine", content: l });
       }), e;
@@ -345,35 +345,35 @@ class m {
     return a.install(this, u), this;
   }
 }
-function _(c = {}) {
-  return new m(c);
+function _(o = {}) {
+  return new m(o);
 }
-m.plugins = {}, m.registerPlugin = function(c, r) {
-  m.plugins[c] = r;
+m.plugins = {}, m.registerPlugin = function(o, r) {
+  m.plugins[o] = r;
 }, typeof window < "u" && (window.ChordproJS = m, window.createChordproJS = _);
 let v = null;
-const g = /* @__PURE__ */ new Map();
-function f(...c) {
-  console.log("🎵 [ChordPro]", ...c);
+const f = /* @__PURE__ */ new Map();
+function g(...o) {
+  console.log("🎵 [ChordPro]", ...o);
 }
-function $(c) {
-  return btoa(unescape(encodeURIComponent(c)));
+function $(o) {
+  return btoa(unescape(encodeURIComponent(o)));
 }
-function C(c) {
-  return c.replace(/\[\[chordpro\]\]\s*\n?/gi, "").replace(/\[\[[^\]]+\]\]/g, "").trim();
+function C(o) {
+  return o.replace(/\[\[chordpro\]\]\s*\n?/gi, "").replace(/\`\`\`chords\s*\n?/gi, "").replace(/\`\`\`*\n?/gi, "").replace(/\[\[[^\]]+\]\]/g, "").trim();
 }
-async function k(c) {
-  f("Detect triggered:", c);
+async function k(o) {
+  g("Detect triggered:", o);
   const r = await logseq.Editor.getCurrentPage();
   if (!r || typeof r.uuid != "string") return;
   const u = await logseq.Editor.getPageBlocksTree(r.uuid);
   if (!u) return;
   function a(s) {
-    for (const o of s) {
-      if (typeof o.content == "string" && o.content.toLowerCase().includes("[[chordpro]]"))
-        return o;
-      if (o.children?.length) {
-        const d = a(o.children);
+    for (const c of s) {
+      if (typeof c.content == "string" && c.content.toLowerCase().includes("[[chordpro]]"))
+        return c;
+      if (c.children?.length) {
+        const d = a(c.children);
         if (d) return d;
       }
     }
@@ -382,21 +382,23 @@ async function k(c) {
   const e = a(u);
   if (!e || typeof e.uuid != "string") return;
   const t = e.content, l = _(), n = $(t);
-  if (g.get(e.uuid) === n) return;
-  g.set(e.uuid, n), f("FOUND chordpro block:", e.uuid), f(`Sanitized source:
+  if (f.get(e.uuid) === n) return;
+  f.set(e.uuid, n), g("FOUND chordpro block:", e.uuid), g(`Sanitized source:
 `, t);
   let p;
   try {
     const s = C(t);
-    p = l.renderToHTML(s);
+    p = l.renderToHTML(s), document.querySelectorAll(".chord-line").forEach((c) => {
+      c.style.color = "#0066cc";
+    });
   } catch (s) {
     console.error("🎵 [ChordPro] Render error", s, { source: t });
     return;
   }
   try {
     const s = await logseq.Editor.getBlockChildren(e.uuid);
-    for (const o of s ?? [])
-      typeof o.content == "string" && o.content.startsWith("```html") && await logseq.Editor.removeBlock(o.uuid);
+    for (const c of s ?? [])
+      typeof c.content == "string" && c.content.startsWith("<h1>") && (g("FOUND child -> killing it", c.uuid), await logseq.Editor.removeBlock(c.uuid));
   } catch (s) {
     console.warn("🎵 [ChordPro] Could not fetch children, skipping removal", s);
   }
@@ -406,7 +408,7 @@ async function k(c) {
     `${p}
 `
     //{ sibling: false }
-  ), f("Rendered successfully");
+  ), g("Rendered successfully");
 }
 function P() {
   v || (v = window.setInterval(() => {
@@ -415,7 +417,7 @@ function P() {
 }
 async function x() {
   console.log("🎵 ChordPro renderer plugin loaded"), setTimeout(() => k("startup"), 800), logseq.App.onRouteChanged(() => {
-    g.clear(), k("route-change");
+    f.clear(), k("route-change");
   }), P();
 }
 logseq.ready(x);
