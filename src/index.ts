@@ -126,7 +126,8 @@ async function detectAndRender(reason: string) {
       if (
         typeof b.content === "string" &&
         b.content.toLowerCase().includes("[[chordpro]]") ||
-        b.content.toLowerCase().includes("{title:")
+        b.content.toLowerCase().includes("{title:") ||
+        b.content.toLowerCase().includes("\`\`\`chords") 
       ) {
         return b;
       }
