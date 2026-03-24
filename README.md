@@ -1,38 +1,104 @@
 # logseq-chordpro-render
 
-This is a small plugin to render logseq blocks with chordpro content as actual guitar chordsheets 
-It is a work in progress and my first attempt att creating a logseq plugin ... 
+Logseq plugin for rendering ChordPro songs directly in place without replacing the source block.
 
-I give thanks to @bergbrains for his [ChordproJSParser](https://github.com/bergbrains/ChordproJSParser)
+The original song stays in your graph as a fenced code block, and the plugin renders a readable chord sheet on top in Logseq preview.
 
-after adding the plugin to logseq any page with a block that contains: 
-```[[chordpro]]
-{title: some cool song}
-{artist: some cool artist}
+Thanks to @bergbrains for [ChordproJSParser](https://github.com/bergbrains/ChordproJSParser).
+
+## What It Does
+
+- Renders fenced `chordpro` and `chords` blocks inline on the page
+- Supports legacy `[[chordpro]]` blocks as a fallback
+- Adds `+` and `-` transpose controls to rendered songs
+- Lets you click a chord to open that chord in Logseq's native right sidebar
+- Maintains a `Master Chordlist` page with one chord block per chord
+- Renders chord diagrams in that `Master Chordlist` via a macro renderer
+- Uses `{define: ...}` chord definitions when present
+- Falls back to a built-in chord library for many common chords
+- On `page-type:: chordpro` pages, ensures a top-level `played` block exists
+- Adds today's journal link under `played` when missing, so songs can be tracked automatically
+
+## Example
+
+````markdown
+```chordpro
+{title: Some Cool Song}
+{artist: Some Cool Artist}
+{define: C base-fret 1 frets x 3 2 0 1 0}
 
 and som[C]e chor[Am]dpro content
-``` 
-will render an html block with text/chords 
+```
+````
 
-## Prerequisites
-You need to have [node](https://nodejs.org/) and [npm or yarn](https://yarnpkg.com/getting-started/install) installed on your system.
+You can also use:
 
-## Manual Installation 
-- clone this repo and build the plugin 
->```
+````markdown
+```chords
+...
+```
+````
+
+## Song Tracking
+
+When you open a page with:
+
+```markdown
+page-type:: chordpro
+```
+
+the plugin will make sure the page contains:
+
+```markdown
+- played
+  - [[2026-03-20]]
+```
+
+It only adds today's journal link if it is not already there.
+
+This makes it easy to build Logseq queries for:
+
+- songs played today
+- songs played in the last 7 days
+- songs played in the last 30 days
+
+## Chord Sidebar Flow
+
+Clicking a rendered chord will:
+
+1. find or create the matching chord block on `Master Chordlist`
+2. open that block in Logseq's native right sidebar
+3. render the chord diagram there through the plugin macro
+
+## Installation
+
+### Manual Installation
+
+```bash
 git clone https://github.com/olterman/logseq-chordpro-render.git
 cd logseq-chordpro-render
-npm install 
-npm run build 
+npm install
+npm run build
 ```
-- open Logseq Desktop client and turn on Developer mode in user settings panel
-- open the toolbar dot menus and navigate to plugins page
-- navigate to the plugins dashboard: tp
-- click Load unpacked plugin button, then select the logseq-chordpro-render directory to load it 
 
-## TODO
-- add Style settings 
-- move render to the top of page without destroying outline structure
-- make the html replace the chordpro on the page instead of in a sibling block 
-- change polling so it doesnt trigger when editing a block (currently polling is disabled)
+Then in Logseq:
 
+1. turn on Developer mode
+2. open Plugins
+3. choose `Load unpacked plugin`
+4. select the `logseq-chordpro-render` directory
+
+## Development
+
+```bash
+npm install
+npm run build
+```
+
+If your Logseq plugin folder is symlinked to this repo, a rebuild plus plugin reload is enough to test changes.
+
+## Notes
+
+- The plugin is built around fenced code rendering first.
+- Legacy `[[chordpro]]` support still exists, but fenced blocks are the primary path.
+- The built-in chord library is meant as a fallback, not a replacement for proper `{define: ...}` lines.

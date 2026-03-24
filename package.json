@@ -4,7 +4,9 @@
   "description": "A logseq plugin to render chordpro content (TS + Vite)",
   "main": "dist/index.js",
   "logseq": {
-    "id": "logseq-chordpro-render-1"
+    "id": "logseq-chordpro-render-1",
+    "title": "ChordPro Render",
+    "main": "dist/index.js"
   },
   "scripts": {
     "dev": "vite build",
